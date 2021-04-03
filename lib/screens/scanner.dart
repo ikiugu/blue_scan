@@ -1,7 +1,6 @@
+import 'package:blue_scan/screens/details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
-
-const TEXT_FONT_SIZE = 20.0;
 
 class Scanner extends StatefulWidget {
   final List<ScanResult> scanResults = <ScanResult>[];
@@ -31,40 +30,20 @@ class _ScannerState extends State<Scanner> {
     return ListView.separated(
       itemCount: widget.scanResults.length,
       itemBuilder: (context, index) {
-        // return GestureDetector(
-        //   onTap: () => print(index),
-        //   child: Container(
-        //     height: 45.0,
-        //     child: Row(
-        //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        //       children: [
-        //         Icon(Icons.bluetooth),
-        //         Text(
-        //           widget.scanResults[index].device.name != ''
-        //               ? widget.scanResults[index].device.name
-        //               : widget.scanResults[index].device.id.toString(),
-        //           style: TextStyle(fontSize: TEXT_FONT_SIZE),
-        //         ),
-        //         Text(
-        //           'RSSI: ${widget.scanResults[index].rssi}',
-        //           style: TextStyle(fontSize: TEXT_FONT_SIZE),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // );
         return ListTile(
           leading: Icon(
             Icons.bluetooth,
             color: Colors.blue.shade900,
           ),
           title: Text(
-              widget.scanResults[index].device.name != ''
-                  ? widget.scanResults[index].device.name
-                  : widget.scanResults[index].device.id.toString(),
-              style: TextStyle(fontSize: TEXT_FONT_SIZE)),
+            widget.scanResults[index].device.name != ''
+                ? widget.scanResults[index].device.name
+                : widget.scanResults[index].device.id.toString(),
+          ),
           subtitle: Text('RSSI: ${widget.scanResults[index].rssi}'),
-          onTap: () => print('noice'),
+          onTap: () {
+            _navigateToSecondScreen(index: index);
+          },
         );
       },
       separatorBuilder: (context, index) {
@@ -92,12 +71,20 @@ class _ScannerState extends State<Scanner> {
     widget.flutterBlue.stopScan();
   }
 
+  void _navigateToSecondScreen({int index}) {
+    ScanResult scanResult = widget.scanResults[index];
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return Details(
+        bluetoothDevice: scanResult.device,
+      );
+    }));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Blue Scan'),
-        backgroundColor: Colors.blue.shade900,
       ),
       body: _buildListViewOfDevices(),
       floatingActionButton: FloatingActionButton(
@@ -105,7 +92,6 @@ class _ScannerState extends State<Scanner> {
         child: Icon(
           Icons.search,
         ),
-        backgroundColor: Colors.blue.shade900,
         onPressed: () => _scanBluetooth(),
       ),
     );

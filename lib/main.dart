@@ -11,6 +11,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Blue Scan',
       home: Scanner(),
+      theme: ThemeData(
+        backgroundColor: Colors.white,
+        primaryColor: Colors.blue.shade900,
+        accentColor: Colors.blue,
+        textTheme: TextTheme(bodyText2: TextStyle(fontSize: 20)),
+      ),
     );
   }
 }
