@@ -1,6 +1,7 @@
 import 'package:blue_scan/screens/details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Scanner extends StatefulWidget {
   final List<ScanResult> scanResults = <ScanResult>[];
@@ -11,6 +12,8 @@ class Scanner extends StatefulWidget {
 }
 
 class _ScannerState extends State<Scanner> {
+  bool searching = false;
+
   @override
   void initState() {
     super.initState();
@@ -23,6 +26,19 @@ class _ScannerState extends State<Scanner> {
       setState(() {
         widget.scanResults.add(scanResult);
       });
+    }
+  }
+
+  Widget _buildBody() {
+    if (searching) {
+      return Center(
+        child: SpinKitRipple(
+          color: Colors.blue.shade900,
+          size: 100.0,
+        ),
+      );
+    } else {
+      return _buildListViewOfDevices();
     }
   }
 
@@ -62,6 +78,8 @@ class _ScannerState extends State<Scanner> {
       ),
     );
 
+    changeState();
+
     widget.flutterBlue.scanResults.listen((List<ScanResult> results) {
       for (ScanResult result in results) {
         _addTolist(result);
@@ -69,6 +87,14 @@ class _ScannerState extends State<Scanner> {
     });
 
     widget.flutterBlue.stopScan();
+
+    changeState();
+  }
+
+  void changeState() {
+    setState(() {
+      searching = !searching;
+    });
   }
 
   void _navigateToSecondScreen({int index}) {
@@ -86,7 +112,7 @@ class _ScannerState extends State<Scanner> {
       appBar: AppBar(
         title: Text('Blue Scan'),
       ),
-      body: _buildListViewOfDevices(),
+      body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Scan',
         child: Icon(
@@ -95,6 +121,5 @@ class _ScannerState extends State<Scanner> {
         onPressed: () => _scanBluetooth(),
       ),
     );
-    ;
   }
 }
