@@ -19,7 +19,7 @@ class _ScannerState extends State<Scanner> {
     _scanBluetooth();
   }
 
-  _addDeviceTolist(final ScanResult scanResult) {
+  _addTolist(final ScanResult scanResult) {
     if (!widget.scanResults.contains(scanResult)) {
       setState(() {
         widget.scanResults.add(scanResult);
@@ -31,24 +31,40 @@ class _ScannerState extends State<Scanner> {
     return ListView.separated(
       itemCount: widget.scanResults.length,
       itemBuilder: (context, index) {
-        return Container(
-          height: 45.0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Icon(Icons.bluetooth),
-              Text(
-                widget.scanResults[index].device.name != ''
-                    ? widget.scanResults[index].device.name
-                    : widget.scanResults[index].device.id.toString(),
-                style: TextStyle(fontSize: TEXT_FONT_SIZE),
-              ),
-              Text(
-                'RSSI: ${widget.scanResults[index].rssi}',
-                style: TextStyle(fontSize: TEXT_FONT_SIZE),
-              ),
-            ],
+        // return GestureDetector(
+        //   onTap: () => print(index),
+        //   child: Container(
+        //     height: 45.0,
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        //       children: [
+        //         Icon(Icons.bluetooth),
+        //         Text(
+        //           widget.scanResults[index].device.name != ''
+        //               ? widget.scanResults[index].device.name
+        //               : widget.scanResults[index].device.id.toString(),
+        //           style: TextStyle(fontSize: TEXT_FONT_SIZE),
+        //         ),
+        //         Text(
+        //           'RSSI: ${widget.scanResults[index].rssi}',
+        //           style: TextStyle(fontSize: TEXT_FONT_SIZE),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // );
+        return ListTile(
+          leading: Icon(
+            Icons.bluetooth,
+            color: Colors.blue.shade900,
           ),
+          title: Text(
+              widget.scanResults[index].device.name != ''
+                  ? widget.scanResults[index].device.name
+                  : widget.scanResults[index].device.id.toString(),
+              style: TextStyle(fontSize: TEXT_FONT_SIZE)),
+          subtitle: Text('RSSI: ${widget.scanResults[index].rssi}'),
+          onTap: () => print('noice'),
         );
       },
       separatorBuilder: (context, index) {
@@ -56,6 +72,7 @@ class _ScannerState extends State<Scanner> {
           thickness: .0,
         );
       },
+      shrinkWrap: true,
     );
   }
 
@@ -68,7 +85,7 @@ class _ScannerState extends State<Scanner> {
 
     widget.flutterBlue.scanResults.listen((List<ScanResult> results) {
       for (ScanResult result in results) {
-        _addDeviceTolist(result);
+        _addTolist(result);
       }
     });
 
