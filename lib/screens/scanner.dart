@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 
+const TEXT_FONT_SIZE = 20.0;
+
 class Scanner extends StatefulWidget {
-  final List<BluetoothDevice> bluetoothDevices = <BluetoothDevice>[];
+  final List<ScanResult> scanResults = <ScanResult>[];
   final FlutterBlue flutterBlue = FlutterBlue.instance;
 
   @override
@@ -17,6 +19,46 @@ class _ScannerState extends State<Scanner> {
     _scanBluetooth();
   }
 
+  _addDeviceTolist(final ScanResult scanResult) {
+    if (!widget.scanResults.contains(scanResult)) {
+      setState(() {
+        widget.scanResults.add(scanResult);
+      });
+    }
+  }
+
+  ListView _buildListViewOfDevices() {
+    return ListView.separated(
+      itemCount: widget.scanResults.length,
+      itemBuilder: (context, index) {
+        return Container(
+          height: 45.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Icon(Icons.bluetooth),
+              Text(
+                widget.scanResults[index].device.name != ''
+                    ? widget.scanResults[index].device.name
+                    : widget.scanResults[index].device.id.toString(),
+                style: TextStyle(fontSize: TEXT_FONT_SIZE),
+              ),
+              Text(
+                'RSSI: ${widget.scanResults[index].rssi}',
+                style: TextStyle(fontSize: TEXT_FONT_SIZE),
+              ),
+            ],
+          ),
+        );
+      },
+      separatorBuilder: (context, index) {
+        return Divider(
+          thickness: .0,
+        );
+      },
+    );
+  }
+
   void _scanBluetooth() {
     widget.flutterBlue.startScan(
       timeout: Duration(
@@ -25,8 +67,8 @@ class _ScannerState extends State<Scanner> {
     );
 
     widget.flutterBlue.scanResults.listen((List<ScanResult> results) {
-      for (ScanResult r in results) {
-        print('Found!!!! ${r.device.id} found! rssi: ${r.rssi}');
+      for (ScanResult result in results) {
+        _addDeviceTolist(result);
       }
     });
 
@@ -40,13 +82,14 @@ class _ScannerState extends State<Scanner> {
         title: Text('Blue Scan'),
         backgroundColor: Colors.blue.shade900,
       ),
+      body: _buildListViewOfDevices(),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Scan',
         child: Icon(
           Icons.search,
         ),
         backgroundColor: Colors.blue.shade900,
-        onPressed: () => print('ola'),
+        onPressed: () => _scanBluetooth(),
       ),
     );
     ;
